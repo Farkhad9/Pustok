@@ -1,6 +1,12 @@
 ﻿namespace PustokApp.Models
 {
-    public class BaseEntity
+    public abstract class BaseEntity
     {
+        public Guid Id { get; init; }
+
+        protected BaseEntity()
+        {
+            Id = Guid.NewGuid();
+        }
     }
 }
