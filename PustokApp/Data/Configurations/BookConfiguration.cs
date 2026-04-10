@@ -13,7 +13,7 @@ namespace PustokApp.Data.Configurations
                    .HasForeignKey(x => x.BookId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Property(x => x.Name).IsRequired().HasMaxLength(255);
+            builder.Property(x => x.Name).IsRequired().HasMaxLength(155);
         }
     }
 }

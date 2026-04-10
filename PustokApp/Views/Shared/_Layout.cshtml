@@ -9,8 +9,8 @@
     <title>Pustok - Book Store HTML Template</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Use Minified Plugins Version For Fast Page Load -->
-    <link rel="stylesheet" type="text/css" media="screen" href="css/plugins.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="~/assets/css/plugins.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="~/assets/css/main.css" />
     <link rel="shortcut icon" type="image/x-icon" href="image/favicon.ico">
 </head>
 
@@ -22,7 +22,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-3 ">
                             <a href="index.html" class="site-brand">
-                                <img src="image/logo.png" alt="">
+                                <img src="~/assets/image/logo.png" alt="">
                             </a>
                         </div>
                         <div class="col-lg-3">
@@ -343,7 +343,7 @@
                                             <div class=" single-cart-block ">
                                                 <div class="cart-product">
                                                     <a href="product-details.html" class="image">
-                                                        <img src="image/products/cart-product-1.jpg" alt="">
+                                                        <img src="~/assets/image/products/cart-product-1.jpg" alt="">
                                                     </a>
                                                     <div class="content">
                                                         <h3 class="title">
@@ -382,7 +382,7 @@
                     <div class="row align-items-sm-end align-items-center">
                         <div class="col-md-4 col-7">
                             <a href="index.html" class="site-brand">
-                                <img src="image/logo.png" alt="">
+                                <img src="~/assets/image/logo.png" alt="">
                             </a>
                         </div>
                         <div class="col-md-5 order-3 order-md-2">
@@ -707,7 +707,7 @@
                 <div class="row align-items-center">
                     <div class="col-lg-4">
                         <a href="index.html" class="site-brand">
-                            <img src="image/logo.png" alt="">
+                            <img src="~/assets/image/logo.png" alt="">
                         </a>
                     </div>
                     <div class="col-lg-8">
@@ -845,8 +845,20 @@
                 </div>
             </div>
         </div>
-            @RenderBody()
-            
+
+
+
+
+
+
+
+
+        @RenderBody()
+
+
+
+
+      
         <div class="modal fade modal-quick-view" id="quickModal" tabindex="-1" role="dialog"
             aria-labelledby="quickModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -865,19 +877,19 @@
                                     "asNavFor": ".product-slider-nav"
                                     }'>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-1.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-1.jpg" alt="">
                                     </div>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-2.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-2.jpg" alt="">
                                     </div>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-3.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-3.jpg" alt="">
                                     </div>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-4.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-4.jpg" alt="">
                                     </div>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-5.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-5.jpg" alt="">
                                     </div>
                                 </div>
                                 <!-- Product Details Slider Nav -->
@@ -894,19 +906,19 @@
               "focusOnSelect": true
               }'>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-1.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-1.jpg" alt="">
                                     </div>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-2.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-2.jpg" alt="">
                                     </div>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-3.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-3.jpg" alt="">
                                     </div>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-4.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-4.jpg" alt="">
                                     </div>
                                     <div class="single-slide">
-                                        <img src="image/products/product-details-5.jpg" alt="">
+                                        <img src="~/assets/image/products/product-details-5.jpg" alt="">
                                     </div>
                                 </div>
                             </div>
@@ -997,28 +1009,28 @@
                 {"breakpoint":320, "settings": {"slidesToShow": 1} }
             ]'>
                 <div class="single-slide">
-                    <img src="image/others/brand-1.jpg" alt="">
+                    <img src="~/assets/image/others/brand-1.jpg" alt="">
                 </div>
                 <div class="single-slide">
-                    <img src="image/others/brand-2.jpg" alt="">
+                    <img src="~/assets/image/others/brand-2.jpg" alt="">
                 </div>
                 <div class="single-slide">
-                    <img src="image/others/brand-3.jpg" alt="">
+                    <img src="~/assets/image/others/brand-3.jpg" alt="">
                 </div>
                 <div class="single-slide">
-                    <img src="image/others/brand-4.jpg" alt="">
+                    <img src="~/assets/image/others/brand-4.jpg" alt="">
                 </div>
                 <div class="single-slide">
-                    <img src="image/others/brand-5.jpg" alt="">
+                    <img src="~/assets/image/others/brand-5.jpg" alt="">
                 </div>
                 <div class="single-slide">
-                    <img src="image/others/brand-6.jpg" alt="">
+                    <img src="~/assets/image/others/brand-6.jpg" alt="">
                 </div>
                 <div class="single-slide">
-                    <img src="image/others/brand-1.jpg" alt="">
+                    <img src="~/assets/image/others/brand-1.jpg" alt="">
                 </div>
                 <div class="single-slide">
-                    <img src="image/others/brand-2.jpg" alt="">
+                    <img src="~/assets/image/others/brand-2.jpg" alt="">
                 </div>
             </div>
         </div>
@@ -1032,7 +1044,7 @@
                 <div class=" col-xl-3 col-lg-4 col-sm-6">
                     <div class="single-footer pb--40">
                         <div class="brand-footer footer-title">
-                            <img src="image/logo--footer.png" alt="">
+                            <img src="~/assets/image/logo--footer.png" alt="">
                         </div>
                         <div class="footer-contact">
                             <p><span class="label">Address:</span><span class="text">Example Street 98, HH2 BacHa, New
@@ -1101,7 +1113,7 @@
                     vel
                     magna volutpat, posuere eros</p>
                 <a href="#" class="payment-block">
-                    <img src="image/icon/payment.png" alt="">
+                    <img src="~/assets/image/icon/payment.png" alt="">
                 </a>
                 <p class="copyright-text">Copyright © 2022 <a href="#" class="author">Pustok</a>. All Right Reserved.
                     <br>
@@ -1110,9 +1122,9 @@
         </div>
     </footer>
     <!-- Use Minified Plugins Version For Fast Page Load -->
-    <script src="js/plugins.js"></script>
-    <script src="js/ajax-mail.js"></script>
-    <script src="js/custom.js"></script>
+    <script src="~/assets/js/plugins.js"></script>
+    <script src="~/assets/js/ajax-mail.js"></script>
+    <script src="~/assets/js/custom.js"></script>
 </body>
 
 

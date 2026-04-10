@@ -1,14 +1,38 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PustokApp.Data;
 using PustokApp.Models;
+using PustokApp.ViewModels;
 
 namespace PustokApp.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(AppDbContext dbContext) : Controller
     {
+        
         public IActionResult Index()
         {
-            return View();
+            HomeVm homeVm = new HomeVm
+            {
+                Sliders = dbContext.Sliders.ToList(),
+
+                FeaturedBooks = dbContext.Books
+                .Include(b => b.Author)
+                .Include(b => b.BookImages)
+                .Where(b => b.IsFeatured)
+                .ToList(),
+                NewBooks = dbContext.Books
+                .Include(b => b.Author)
+                .Include(b => b.BookImages)
+                .Where(b => b.IsNew)
+                .ToList(),
+                DiscountedBooks = dbContext.Books
+                .Include(b => b.Author)
+                .Include(b => b.BookImages)
+                .Where(b => b.DiscountPercent > 0)
+                .ToList()
+            };
+            return View(homeVm);
         }
 
         public IActionResult Privacy()
