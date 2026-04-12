@@ -7,6 +7,8 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public string ButtonLink { get; set; }
+        public string ButtonText { get; set; }
+        public bool IsMain { get; set; }
 
     }
 

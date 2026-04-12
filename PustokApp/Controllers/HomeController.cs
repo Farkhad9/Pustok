@@ -21,11 +21,13 @@ namespace PustokApp.Controllers
                 .Include(b => b.BookImages)
                 .Where(b => b.IsFeatured)
                 .ToList(),
+
                 NewBooks = dbContext.Books
                 .Include(b => b.Author)
                 .Include(b => b.BookImages)
                 .Where(b => b.IsNew)
                 .ToList(),
+
                 DiscountedBooks = dbContext.Books
                 .Include(b => b.Author)
                 .Include(b => b.BookImages)

@@ -26,11 +26,11 @@
                         </div>
                         <div class="row g-0">
                             <div class="col-xl-6 col-md-6 col-sm-7">
-                                <div class="home-content-inner content-left-side text-start">
+                                <div class="home-content-inner @(slider.IsMain ? "content-left-side" : "content-right-side") text-start">
                                     <h1>@Html.Raw(@slider.Title)</h1>
                                     <h2>@slider.Description</h2>
                                     <a href="@slider.ButtonLink" class="btn btn-outlined--primary">
-                                         $78.09 - Order Now!
+                                         @slider.ButtonText
                                     </a>
                                 </div>
                             </div>
