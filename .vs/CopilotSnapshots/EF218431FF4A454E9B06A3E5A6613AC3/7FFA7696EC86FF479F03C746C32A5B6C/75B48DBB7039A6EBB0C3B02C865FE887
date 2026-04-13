@@ -159,10 +159,7 @@ Home Slider Tab
                             {"breakpoint":480, "settings": {"slidesToShow": 1} },
                             {"breakpoint":320, "settings": {"slidesToShow": 1} }
                         ]'>
-                    </div>
-                    @foreach (var book in Model)
-                    {
-                                            <div class="single-slide">
+                        <div class="single-slide">
                             <div class="product-card">
                                 <div class="product-header">
                                     <a href="#" class="author">
@@ -690,8 +687,7 @@ Home Slider Tab
                                 </div>
                             </div>
                         </div>
-                    
-                        }
+                    </div>
                 </div>
                 <div class="tab-pane" id="men" role="tabpanel" aria-labelledby="men-tab">
                     <div class="product-slider multiple-row  slider-border-multiple-row  sb-slick-slider"
