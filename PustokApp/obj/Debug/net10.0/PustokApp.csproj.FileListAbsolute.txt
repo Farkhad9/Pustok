@@ -181,4 +181,3 @@ C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\6mhhvehtp
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\pkoat18uxq-{0}-3lf3m66jgj-3lf3m66jgj.gz
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\8iggqxm401-{0}-hyivfevrtb-hyivfevrtb.gz
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\PustokApp.csproj.Up2Date
-C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

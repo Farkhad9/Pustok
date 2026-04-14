@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PustokApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d76f33bd948e645c196deca7691b0c3afdfc12d5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a6ed3682ff825ae4d3797ebba9fe5047b2ca8938")]
 [assembly: System.Reflection.AssemblyProductAttribute("PustokApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PustokApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
