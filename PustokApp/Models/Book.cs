@@ -1,11 +1,17 @@
-﻿namespace PustokApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace PustokApp.Models
 {
     public class Book : BaseEntity
 
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal DiscountPercent { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
         public string Code { get; set; }
         public bool InStock { get; set; }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PustokApp.Data;
 
@@ -11,9 +12,11 @@ using PustokApp.Data;
 namespace PustokApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260415201907_AddNewIdDefaults")]
+    partial class AddNewIdDefaults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,19 +126,6 @@ namespace PustokApp.Data.Migrations
                     b.HasIndex("TagId");
 
                     b.ToTable("BookTags");
-                });
-
-            modelBuilder.Entity("PustokApp.Models.Setting", b =>
-                {
-                    b.Property<string>("Key")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Key");
-
-                    b.ToTable("Settings");
                 });
 
             modelBuilder.Entity("PustokApp.Models.Slider", b =>

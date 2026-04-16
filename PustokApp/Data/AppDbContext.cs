@@ -5,6 +5,7 @@ namespace PustokApp.Data
 {
     public class AppDbContext : DbContext
     {
+        public DbSet <Setting> Settings { get; set; }
         public DbSet<Slider> Sliders { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<Book> Books { get; set; }

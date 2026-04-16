@@ -20,7 +20,9 @@
                             <a href="cart.html" class="single-btn"><i class="fas fa-shopping-basket"></i></a>
                             <a href="wishlist.html" class="single-btn"><i class="fas fa-heart"></i></a>
                             <a href="compare.html" class="single-btn"><i class="fas fa-random"></i></a>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#quickModal" class="single-btn"><i class="fas fa-eye"></i></a>
+                            <a asp-controller="Book" asp-action="BookModal" asp-route-id="@book.Id" class="single-btn bookModalIcon">
+                                <i class="fas fa-eye"></i>
+                            </a>
                         </div>
                     </div>
                 </div>

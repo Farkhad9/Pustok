@@ -5,9 +5,9 @@ using PustokApp.ViewModels;
 
 namespace PustokApp.Controllers
 {
-    public class BookController (AppDbContext context): Controller
+    public class BookController(AppDbContext context) : Controller
     {
-        public IActionResult Details (Guid id)
+        public IActionResult Details(Guid id)
         {
             var book = context.Books
                 .Include(b => b.Author)
@@ -23,11 +23,24 @@ namespace PustokApp.Controllers
                 RelatedBooks = context.Books
                 .Include(b => b.Author)
                 .Include(b => b.BookImages)
-                .Where(b=>b.AuthorId == book.AuthorId && b.Id != book.Id)
+                .Where(b => b.AuthorId == book.AuthorId && b.Id != book.Id)
                 .Take(4)
                 .ToList()
             };
             return View(bookVm);
+        }
+        public IActionResult BookModal(Guid Id)
+        {
+            var book = context.Books
+                .Include(b => b.Author)
+                .Include(b => b.BookImages)
+                .Include(b => b.BookImages)
+                .Include(b => b.BookTags)
+                .ThenInclude(bt => bt.Tag)
+                .FirstOrDefault(b => b.Id == Id);
+            if (book == null)
+                return NotFound();
+            return PartialView("_BookModalPartialView", book);
         }
     }
 }
