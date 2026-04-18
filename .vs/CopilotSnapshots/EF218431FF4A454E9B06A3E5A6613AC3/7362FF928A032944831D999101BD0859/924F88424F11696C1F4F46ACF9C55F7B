@@ -1,4 +1,4 @@
-@model PustokApp.Models.Slider
+﻿@model PustokApp.Models.Slider
 @{
     ViewData["Title"] = "Update Slider";
 }

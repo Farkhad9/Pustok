@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PustokApp.Data;
 using PustokApp.Models;
 using System.Linq;
@@ -31,11 +31,15 @@ namespace PustokApp.Areas.Manage.Controllers
         {
             if (!ModelState.IsValid)
                 return View(slider);
-
-            var file = slider.File;
-            if (file == null)
+           var file= slider.File;
+            if (!file.ContentType.Contains("image/"))
+            { 
+                ModelState.AddModelError("File", "Please upload a valid image file.");
+                return View(slider);
+            }
+            if (file.Length > 2 * 1024 * 1024)
             {
-                ModelState.AddModelError("File", "Please upload an image for the slider.");
+                ModelState.AddModelError("File", "File size must be less than 2MB.");
                 return View(slider);
             }
 
@@ -113,6 +117,19 @@ namespace PustokApp.Areas.Manage.Controllers
             var file = slider.File;
             if (file != null)
             {
+                if (!file.ContentType.Contains("image/"))
+                { 
+                    ModelState.AddModelError("File", "Please upload a valid image file.");
+                    slider.ImageUrl = existingSlider.ImageUrl;
+                    return View(slider);
+                }
+                if (file.Length > 2 * 1024 * 1024)
+                {
+                    ModelState.AddModelError("File", "File size must be less than 2MB.");
+                    slider.ImageUrl = existingSlider.ImageUrl;
+                    return View(slider);
+                }
+
                 // Delete old image
                 if (!string.IsNullOrEmpty(existingSlider.ImageUrl))
                 {

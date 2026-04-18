@@ -1,3 +1,4 @@
+wwwroot\favicon.ico
 wwwroot\assets\css\main.css
 wwwroot\assets\css\plugins.css
 wwwroot\assets\fonts\fa-brands-400.eot
@@ -99,9 +100,8 @@ wwwroot\assets\image\products\product-details-4.jpg
 wwwroot\assets\image\products\product-details-5.jpg
 wwwroot\assets\js\ajax-mail.js
 wwwroot\assets\js\custom.js
-wwwroot\assets\js\main.js
 wwwroot\assets\js\plugins.js
-wwwroot\favicon.ico
+wwwroot\assets\js\main.js
 wwwroot\manage\css\sb-admin-2.css
 wwwroot\manage\css\sb-admin-2.min.css
 wwwroot\manage\img\undraw_posting_photo.svg
@@ -1957,6 +1957,7 @@ wwwroot\manage\vendor\jquery\jquery.min.map
 wwwroot\manage\vendor\jquery\jquery.slim.js
 wwwroot\manage\vendor\jquery\jquery.slim.min.js
 wwwroot\manage\vendor\jquery\jquery.slim.min.map
+wwwroot\assets\image\bg-images\e8616750-0812-4f37-86d6-78a39ed20cab.jpg
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\assets\js\plugins.js
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\assets\js\custom.js
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\favicon.ico
