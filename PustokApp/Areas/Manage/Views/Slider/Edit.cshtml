@@ -1,0 +1,72 @@
+@model PustokApp.Models.Slider
+@{
+    ViewData["Title"] = "Update Slider";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="mb-3">
+            <h1>Update Slider</h1>
+        </div>
+
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ImageUrl" />
+
+            <div class="form-group mb-3">
+                <label>Current Image</label><br />
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="~/assets/image/bg-images/@Model.ImageUrl" alt="Current Slider Image" style="width: 200px; object-fit: cover;" class="img-thumbnail" />
+                }
+                else
+                {
+                    <span class="text-muted">No image available</span>
+                }
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="File">Change Slider Image (Leave empty to keep current)</label>
+                <input asp-for="File" type="file" class="form-control-file" accept="image/*" />
+                <span asp-validation-for="File" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Title">Title (HTML supported)</label>
+                <input asp-for="Title" class="form-control" placeholder="Enter slider title" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Description">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            
+            <div class="form-row mb-3">
+                <div class="form-group col-md-6">
+                    <label asp-for="ButtonText">Button Text</label>
+                    <input asp-for="ButtonText" class="form-control" placeholder="e.g. Learn More" />
+                    <span asp-validation-for="ButtonText" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label asp-for="ButtonLink">Button Link</label>
+                    <input asp-for="ButtonLink" class="form-control" placeholder="e.g. /shop or #url" />
+                    <span asp-validation-for="ButtonLink" class="text-danger"></span>
+                </div>
+            </div>
+            
+            <div class="form-group form-check mb-4">
+                <input asp-for="IsMain" class="form-check-input" />
+                <label asp-for="IsMain" class="form-check-label">Is Main Slider?</label>
+            </div>
+            
+            <button type="submit" class="btn btn-warning mt-3">Update</button>
+            <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

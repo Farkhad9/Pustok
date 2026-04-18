@@ -36,7 +36,7 @@
                         <td>
                             <a asp-action="Details" asp-route-id="@slider.Id" class="btn btn-info btn-sm">Details</a>
                             <a asp-action="Edit" asp-route-id="@slider.Id" class="btn btn-warning btn-sm">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@slider.Id" class="btn btn-danger btn-sm">Delete</a>
+                            <a asp-action="Delete" asp-route-id="@slider.Id" class="btn btn-danger btn-sm deleteSlider">Delete</a>
                         </td>
                     </tr>
                 }
@@ -44,3 +44,42 @@
         </table>
     </div>
 </div>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $(".deleteSlider").click(function (e) {
+                e.preventDefault();
+                var url = $(this).attr("href");
+                
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This slider and its image file will be permanently deleted!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            type: "POST",
+                            success: function () {
+                                Swal.fire("Deleted!", "The slider has been deleted.", "success").then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function () {
+                                Swal.fire("Error!", "An error occurred while deleting the slider.", "error");
+                            }
+                        });
+                    }
+                    else if (result.dismiss === Swal.DismissReason.cancel) {
+                        Swal.fire("Cancelled", "The slider is safe.", "info");
+                    }
+                });
+            });
+        });
+    </script>
+}

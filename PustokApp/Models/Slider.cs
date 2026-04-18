@@ -1,4 +1,7 @@
-﻿namespace PustokApp.Models
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace PustokApp.Models
 {
     public class Slider
     {
@@ -9,6 +12,8 @@
         public string ButtonLink { get; set; }
         public string ButtonText { get; set; }
         public bool IsMain { get; set; }
+        [NotMapped]
+        public IFormFile File { get; set; }
 
     }
 

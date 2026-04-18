@@ -1,0 +1,92 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using PustokApp.Data;
+using PustokApp.Models;
+using System.Linq;
+using System.IO;
+
+namespace PustokApp.Areas.Manage.Controllers
+{
+    [Area("Manage")]
+    public class SliderController : Controller
+    {
+        private readonly AppDbContext _context;
+
+        public SliderController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public IActionResult Index()
+        {
+            var sliders = _context.Sliders.ToList();
+            return View(sliders);
+        }
+        public IActionResult Create()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Slider slider)
+        {
+            if (!ModelState.IsValid)
+                return View(slider);
+           var file= slider.File;
+            if (!file.ContentType.Contains("image/"))
+            { 
+                ModelState.AddModelError("File", "Please upload a valid image file.");
+                return View(slider);
+            }
+            if (file.Length > 2 * 1024 * 1024)
+            {
+                ModelState.AddModelError("File", "File size must be less than 2MB.");
+                return View(slider);
+            }
+
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "image", "bg-images", fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+            var newSlider = new Slider
+            {
+                Title = slider.Title,
+                Description = slider.Description,
+                ButtonLink = slider.ButtonLink,
+                ButtonText = slider.ButtonText,
+                IsMain = slider.IsMain,
+                ImageUrl= fileName
+            };
+            newSlider.ImageUrl = fileName;
+
+            _context.Sliders.Add(newSlider);
+            _context.SaveChanges();
+            
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            var slider = _context.Sliders.Find(id);
+            if (slider == null) return NotFound();
+
+            // Delete the physical file
+            if (!string.IsNullOrEmpty(slider.ImageUrl))
+            {
+                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "image", "bg-images", slider.ImageUrl);
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            _context.Sliders.Remove(slider);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+    }
+}

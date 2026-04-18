@@ -1,0 +1,43 @@
+﻿@model PustokApp.Models.Author
+
+<div class="modal-header">
+    <h5 class="modal-title">Author Details</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>ID</th>
+                <td>@Model.Id</td>
+            </tr>
+            <tr>
+                <th>Full Name</th>
+                <td>@Model.FullName</td>
+            </tr>
+            <tr>
+                <th>Total Books</th>
+                <td>@(Model.Books != null ? Model.Books.Count : 0)</td>
+            </tr>
+            @if (Model.Books != null && Model.Books.Any())
+            {
+                <tr>
+                    <th>Books List</th>
+                    <td>
+                        <ul class="mb-0 ps-3">
+                            @foreach (var book in Model.Books)
+                            {
+                                <li>@book.Name</li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+</div>

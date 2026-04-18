@@ -1,0 +1,16 @@
+﻿@model Author
+<h1>
+	Author Details
+</h1>
+<div class="card mb-3" style="max-width: 540px;">
+	<div class="row g-0">
+		<div class="col-md-8">
+			<div class="card-body">
+				<h5 class="card-title">@Model.FullName</h5>
+				<p class="card-text"><strong>Books:</strong> @Model.Books.Count</p>
+				<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+				<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+			</div>
+		</div>
+	</div>
+</div>

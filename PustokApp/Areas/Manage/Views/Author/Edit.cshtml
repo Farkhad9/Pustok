@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Edit Author";
+}
+@model Author
+<div class="row">
+    <div class="col-md-6">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Edit Author</h1>
+        </div>
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />  ← добавь это!
+            <div class="form-group">
+                <label asp-for="FullName"></label>
+                <input asp-for="FullName" class="form-control" placeholder="Enter author's full name">
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="/Manage/Author/Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+@section scripts
+{
+    <partial name="_ValidationScriptsPartial" /> 
+}

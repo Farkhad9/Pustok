@@ -1,0 +1,57 @@
+﻿@model PustokApp.Models.Slider
+@{
+    ViewData["Title"] = "Create Slider";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="mb-3">
+            <h1>Create Slider</h1>
+        </div>
+
+        <form asp-action="Create" method="post">
+            <div class="form-group">
+                <label asp-for="ImageUrl">Image URL</label>
+                <input asp-for="ImageUrl" class="form-control" placeholder="Enter image filename or URL" />
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Title">Title (HTML supported)</label>
+                <input asp-for="Title" class="form-control" placeholder="Enter slider title" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Description">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label asp-for="ButtonText">Button Text</label>
+                    <input asp-for="ButtonText" class="form-control" placeholder="e.g. Learn More" />
+                    <span asp-validation-for="ButtonText" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label asp-for="ButtonLink">Button Link</label>
+                    <input asp-for="ButtonLink" class="form-control" placeholder="e.g. /shop or #url" />
+                    <span asp-validation-for="ButtonLink" class="text-danger"></span>
+                </div>
+            </div>
+            
+            <div class="form-group form-check">
+                <input asp-for="IsMain" class="form-check-input" />
+                <label asp-for="IsMain" class="form-check-label">Is Main Slider?</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-3">Create</button>
+            <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
