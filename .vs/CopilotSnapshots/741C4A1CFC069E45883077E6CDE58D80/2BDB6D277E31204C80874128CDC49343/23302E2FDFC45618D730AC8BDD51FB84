@@ -1,0 +1,66 @@
+﻿@model List<PustokApp.Models.Book>
+@{
+    ViewData["Title"] = "Books";
+    int count = 0;
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Books</h1>
+            <a asp-action="Create" class="btn btn-primary">Create New</a>
+        </div>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model)
+                {
+                    count++;
+                    <tr>
+                        <td>@count</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(book.MainImageUrl))
+                            {
+                                <img src="~/assets/image/products/@book.MainImageUrl" alt="Book Image" style="width: 80px; object-fit: cover;" class="img-thumbnail" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">No Image</span>
+                            }
+                        </td>
+                        <td>@book.Name</td>
+                        <td>@book.Code</td>
+                        <td>$@book.Price</td>
+                        <td>@book.DiscountPercent%</td>
+                        <td>
+                            @if (book.InStock)
+                            {
+                                <span class="badge badge-success">In Stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger">Out of Stock</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@book.Id" class="btn btn-info btn-sm">Details</a>
+                            <a asp-action="Edit" asp-route-id="@book.Id" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@book.Id" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

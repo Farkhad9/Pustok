@@ -1,0 +1,77 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using PustokApp.Models;
+using PustokApp.Areas.Manage.ViewModels;
+
+namespace PustokApp.Areas.Manage.Controllers
+{
+    [Area("Manage")]
+    public class AdminAccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager) : Controller
+    {
+        public async Task<IActionResult> CreateAdmin()
+        {
+            AppUser admin = new AppUser()
+            {
+                UserName = "_admin",
+                FullName = "Farkhad Ismiyev",
+                Email = "sds37061@gmail.com"
+            };
+            IdentityResult result = await userManager.CreateAsync(admin, "_Admin123!");
+            if (!result.Succeeded)
+            {
+               return Json(result.Errors);
+            }
+            await userManager.AddToRoleAsync(admin, "Admin");
+            return Content("Admin account created successfully");
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(AdminLoginVm model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await userManager.FindByNameAsync(model.Username);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = "Username or password is incorrect";
+                return View(model);
+            }
+
+            // Способ 1: Проверка пароля отдельно
+            var isPasswordValid = await userManager.CheckPasswordAsync(user, model.Password);
+            if (!isPasswordValid)
+            {
+                ViewBag.ErrorMessage = "Username or password is incorrect";
+                return View(model);
+            }
+
+            // Способ 2: Вход с PasswordSignInAsync
+            var result = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+            if (!result.Succeeded)
+            {
+                ViewBag.ErrorMessage = "Username or password is incorrect";
+                return View(model);
+            }
+
+            return RedirectToAction("Index", "Dashboard");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await signInManager.SignOutAsync();
+            return RedirectToAction("Login");
+        }
+    }
+}

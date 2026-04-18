@@ -1,0 +1,33 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using PustokApp.Models;
+using System.ComponentModel.DataAnnotations;
+
+namespace PustokApp.Areas.Manage.Controllers
+{
+    [Area("Manage")]
+    public class AdminAccountController(UserManager<AppUser> userManager) : Controller
+    {
+        public async Task<IActionResult> CreateAdmin()
+        {
+            AppUser admin = new AppUser()
+            {
+                UserName = "_admin",
+                FullName = "Farkhad Ismiyev",
+                Email = "sds37061@gmail.com"
+            };
+            IdentityResult result = await userManager.CreateAsync(admin, "_Admin123!");
+            if (!result.Succeeded)
+            {
+               return Json(result.Errors);
+            }
+            userManager.AddToRoleAsync(admin, "Admin");
+            return Content("Admin account created successfully");
+        }
+        public IActionResult Login()
+        {
+            return View();
+        }
+        
+    }
+}

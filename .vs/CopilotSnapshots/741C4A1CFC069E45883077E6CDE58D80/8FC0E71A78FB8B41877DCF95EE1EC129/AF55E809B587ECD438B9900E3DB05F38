@@ -1,0 +1,305 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using PustokApp.Data;
+using PustokApp.Models;
+using System.Linq;
+using System.IO;
+using System;
+using Microsoft.EntityFrameworkCore;
+
+namespace PustokApp.Areas.Manage.Controllers
+{
+    [Area("Manage")]
+    public class BookController : Controller
+    {
+        private readonly AppDbContext _context;
+
+        public BookController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public IActionResult Index()
+        {
+            var books = _context.Books.ToList();
+            return View(books);
+        }
+        public IActionResult Create()
+        {
+            ViewBag.Authors = _context.Authors.ToList();
+            ViewBag.Tags = _context.Tags.ToList();
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Book book)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Authors = _context.Authors.ToList();
+                ViewBag.Tags = _context.Tags.ToList();
+                return View(book);
+            }
+
+            string basePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "image", "products");
+
+            // Create directory if it doesn't exist
+            if (!Directory.Exists(basePath))
+            {
+                Directory.CreateDirectory(basePath);
+            }
+
+            // Save Main Photo
+            if (book.MainPhoto != null)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(book.MainPhoto.FileName);
+                string filePath = Path.Combine(basePath, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    book.MainPhoto.CopyTo(stream);
+                }
+                book.MainImageUrl = fileName;
+            }
+
+            // Save Hover Photo
+            if (book.HoverPhoto != null)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(book.HoverPhoto.FileName);
+                string filePath = Path.Combine(basePath, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    book.HoverPhoto.CopyTo(stream);
+                }
+                book.HoverImageUrl = fileName;
+            }
+
+            // Save Additional Images
+            if (book.Files != null && book.Files.Any())
+            {
+                foreach (var file in book.Files)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string filePath = Path.Combine(basePath, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+                    book.BookImages.Add(new BookImage { ImageUrl = fileName });
+                }
+            }
+
+            // Assign Tags
+            if (book.TagIds != null && book.TagIds.Any())
+            {
+                foreach (Guid tagId in book.TagIds)
+                {
+                    book.BookTags.Add(new BookTag { TagId = tagId });
+                }
+            }
+
+            _context.Books.Add(book);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult Edit(Guid id)
+        {
+            var book = _context.Books
+                .Include(x => x.BookTags)
+                .Include(x => x.BookImages)
+                .FirstOrDefault(x => x.Id == id);
+            if (book == null) return NotFound();
+            ViewBag.Authors = _context.Authors.ToList();
+            ViewBag.Tags = _context.Tags.ToList();
+            return View(book);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Guid id, Book book)
+        {
+            if (id != book.Id) return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Authors = _context.Authors.ToList();
+                ViewBag.Tags = _context.Tags.ToList();
+                return View(book);
+            }
+
+            var existingBook = _context.Books
+                .Include(x => x.BookTags)
+                .Include(x => x.BookImages)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (existingBook == null) return NotFound();
+
+            string basePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "image", "products");
+
+            if (!Directory.Exists(basePath))
+            {
+                Directory.CreateDirectory(basePath);
+            }
+
+            // Update Main Photo
+            if (book.MainPhoto != null)
+            {
+                if (!string.IsNullOrEmpty(existingBook.MainImageUrl))
+                {
+                    string oldFilePath = Path.Combine(basePath, existingBook.MainImageUrl);
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                }
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(book.MainPhoto.FileName);
+                string filePath = Path.Combine(basePath, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    book.MainPhoto.CopyTo(stream);
+                }
+                existingBook.MainImageUrl = fileName;
+            }
+
+            // Update Hover Photo
+            if (book.HoverPhoto != null)
+            {
+                if (!string.IsNullOrEmpty(existingBook.HoverImageUrl))
+                {
+                    string oldFilePath = Path.Combine(basePath, existingBook.HoverImageUrl);
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                }
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(book.HoverPhoto.FileName);
+                string filePath = Path.Combine(basePath, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    book.HoverPhoto.CopyTo(stream);
+                }
+                existingBook.HoverImageUrl = fileName;
+            }
+
+            // Update Additional Images
+            if (book.Files != null && book.Files.Any())
+            {
+                foreach (var file in book.Files)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string filePath = Path.Combine(basePath, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+                    existingBook.BookImages.Add(new BookImage { ImageUrl = fileName });
+                }
+            }
+
+            // Update basic properties
+            existingBook.Name = book.Name;
+            existingBook.Description = book.Description;
+            existingBook.Price = book.Price;
+            existingBook.DiscountPercent = book.DiscountPercent;
+            existingBook.Code = book.Code;
+            existingBook.InStock = book.InStock;
+            existingBook.IsFeatured = book.IsFeatured;
+            existingBook.IsNew = book.IsNew;
+            existingBook.AuthorId = book.AuthorId;
+
+            // Update Tags - only remove and add if changed
+            var currentTagIds = existingBook.BookTags.Select(bt => bt.TagId).ToList();
+            var newTagIds = book.TagIds ?? new List<Guid>();
+
+            // Remove tags that are no longer selected
+            var tagsToRemove = currentTagIds.Except(newTagIds).ToList();
+            foreach (var tagId in tagsToRemove)
+            {
+                var bookTagToRemove = existingBook.BookTags.FirstOrDefault(bt => bt.TagId == tagId);
+                if (bookTagToRemove != null)
+                {
+                    existingBook.BookTags.Remove(bookTagToRemove);
+                }
+            }
+
+            // Add only new tags that weren't previously selected
+            var tagsToAdd = newTagIds.Except(currentTagIds).ToList();
+            foreach (var tagId in tagsToAdd)
+            {
+                existingBook.BookTags.Add(new BookTag { TagId = tagId });
+            }
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Books.Any(x => x.Id == id))
+                {
+                    return NotFound();
+                }
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public IActionResult Delete(Guid id)
+        {
+            var book = _context.Books
+                .Include(x => x.BookImages)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (book == null) return NotFound();
+
+            string basePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "image", "products");
+
+            // Delete Main Photo
+            if (!string.IsNullOrEmpty(book.MainImageUrl))
+            {
+                string filePath = Path.Combine(basePath, book.MainImageUrl);
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            // Delete Hover Photo
+            if (!string.IsNullOrEmpty(book.HoverImageUrl))
+            {
+                string filePath = Path.Combine(basePath, book.HoverImageUrl);
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            // Delete Additional Images
+            if (book.BookImages != null)
+            {
+                foreach (var image in book.BookImages)
+                {
+                    if (!string.IsNullOrEmpty(image.ImageUrl))
+                    {
+                        string filePath = Path.Combine(basePath, image.ImageUrl);
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                    }
+                }
+            }
+
+            _context.Books.Remove(book);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
+    }
+}

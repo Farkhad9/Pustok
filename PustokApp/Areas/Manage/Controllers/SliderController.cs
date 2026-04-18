@@ -55,7 +55,6 @@ namespace PustokApp.Areas.Manage.Controllers
                 IsMain = slider.IsMain,
                 ImageUrl= fileName
             };
-            newSlider.ImageUrl = fileName;
 
             _context.Sliders.Add(newSlider);
             _context.SaveChanges();
@@ -64,7 +63,7 @@ namespace PustokApp.Areas.Manage.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
             var slider = _context.Sliders.Find(id);
             if (slider == null) return NotFound();
@@ -86,7 +85,7 @@ namespace PustokApp.Areas.Manage.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public IActionResult Edit(Guid? id)
         {
             if (id == null) return NotFound();
             var slider = _context.Sliders.Find(id);
@@ -97,7 +96,7 @@ namespace PustokApp.Areas.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Slider slider)
+        public IActionResult Edit(Guid id, Slider slider)
         {
             if (id != slider.Id) return BadRequest();
 
