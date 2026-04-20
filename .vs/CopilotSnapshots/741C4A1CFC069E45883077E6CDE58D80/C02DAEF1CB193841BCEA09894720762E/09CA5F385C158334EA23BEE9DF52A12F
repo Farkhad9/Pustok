@@ -1,0 +1,22 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using PustokApp.Areas.Manage.ViewModels.UserVm;
+using PustokApp.Models;
+
+namespace PustokApp.Areas.Manage.Controllers
+{
+    [Area("Manage")]
+    public class AccountController 
+        (
+        UserManager<AppUser> userManager,
+        SignInManager<AppUser> signInManager,
+        RoleManager<IdentityRole> roleManager
+        ) : Controller
+    {
+        public IActionResult Index()
+        {
+            return View();
+        }
+    }
+}

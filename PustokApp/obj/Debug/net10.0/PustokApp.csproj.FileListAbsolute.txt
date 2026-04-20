@@ -270,8 +270,6 @@ C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\zoc91n2lm
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\lftbf4s3sb-{0}-5sm78wm4ln-5sm78wm4ln.gz
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\alykhe8vql-{0}-qam996dp9n-qam996dp9n.gz
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\6mhhvehtpj-{0}-ytnqdzmoai-ytnqdzmoai.gz
-C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\pkoat18uxq-{0}-3lf3m66jgj-3lf3m66jgj.gz
-C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\c9omw494xo-{0}-d1wqbhpm4r-d1wqbhpm4r.gz
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\8iggqxm401-{0}-hyivfevrtb-hyivfevrtb.gz
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\zy7z1eu90h-{0}-61n19gt1b8-61n19gt1b8.gz
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\ur39ybc5ge-{0}-r3unjvhb45-r3unjvhb45.gz
@@ -1979,3 +1977,5 @@ C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\PustokApp.genruntime
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\ref\PustokApp.dll
 C:\Users\User\Desktop\PustokApp\PustokApp\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\c9omw494xo-{0}-rqz0janmkw-rqz0janmkw.gz
+C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\pkoat18uxq-{0}-3lf3m66jgj-3lf3m66jgj.gz

@@ -1,0 +1,281 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using PustokApp.Models;
+using PustokApp.ViewModels.UserVm;
+using PustokApp.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace PustokApp.Controllers
+{
+    public class AccountController : Controller
+    {
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly AppDbContext _dbContext;
+
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, AppDbContext dbContext)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _dbContext = dbContext;
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterVm model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Check if username already exists
+            var existingUser = await _userManager.FindByNameAsync(model.Username);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("Username", "Username already exists.");
+                return View(model);
+            }
+
+            // Check if email already exists
+            var existingEmail = await _userManager.FindByEmailAsync(model.Email);
+            if (existingEmail != null)
+            {
+                ModelState.AddModelError("Email", "Email already exists.");
+                return View(model);
+            }
+
+            var user = new AppUser
+            {
+                UserName = model.Username,
+                Email = model.Email,
+                FullName = model.FullName
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View(model);
+            }
+
+            // Add user to default role
+            await _userManager.AddToRoleAsync(user, "User");
+
+            // Auto sign in after registration
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginVm model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.FindByNameAsync(model.Username);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Username or password is incorrect");
+                return View(model);
+            }
+
+            // Проверяем если аккаунт заблокирован
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                ModelState.AddModelError("", "Your account is locked. Please try again after 15 minutes.");
+                return View(model);
+            }
+
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (!isPasswordValid)
+            {
+                // Увеличиваем счётчик неудачных попыток
+                await _userManager.AccessFailedAsync(user);
+                
+                // Проверяем если аккаунт теперь заблокирован после этой попытки
+                if (await _userManager.IsLockedOutAsync(user))
+                {
+                    ModelState.AddModelError("", "Your account has been locked due to multiple failed login attempts. Please try again after 15 minutes.");
+                    return View(model);
+                }
+
+                var failedAttempts = await _userManager.GetAccessFailedCountAsync(user);
+                var remainingAttempts = 3 - failedAttempts;
+
+                if (remainingAttempts > 0)
+                {
+                    ModelState.AddModelError("", $"Username or password is incorrect. {remainingAttempts} attempt(s) remaining before your account is locked.");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Your account has been locked due to multiple failed login attempts. Please try again after 15 minutes.");
+                }
+
+                return View(model);
+            }
+
+            // Сбрасываем счётчик неудачных попыток при успешном входе
+            if (await _userManager.GetAccessFailedCountAsync(user) > 0)
+            {
+                await _userManager.ResetAccessFailedCountAsync(user);
+            }
+
+            // Вход с Remember Me опцией
+            await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
+
+            // Transfer basket items from cookie to database on login
+            var basketCookie = Request.Cookies["basket"];
+            if (!string.IsNullOrEmpty(basketCookie))
+            {
+                var basketItems = System.Text.Json.JsonSerializer.Deserialize<List<BasketItemVm>>(basketCookie);
+                if (basketItems != null && basketItems.Count > 0)
+                {
+                    // Clear old basket for this user
+                    var oldBasketItems = _dbContext.BasketItems.Where(b => b.AppUserId == user.Id).ToList();
+                    _dbContext.BasketItems.RemoveRange(oldBasketItems);
+
+                    // Add items from cookie
+                    foreach (var item in basketItems)
+                    {
+                        _dbContext.BasketItems.Add(new BasketItem
+                        {
+                            BookId = item.BookId,
+                            Count = item.Count,
+                            AppUserId = user.Id
+                        });
+                    }
+
+                    _dbContext.SaveChanges();
+
+                    // Delete cookie
+                    Response.Cookies.Delete("basket");
+                }
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpGet]
+        public async Task<IActionResult> UserProfile(string tab = "dashboard")
+        {
+            ViewBag.Tab = tab;
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return NotFound();
+
+            var vm = new UserProfileVm
+            {
+                UserProfileInfo = new UserProfileInfoVm
+                {
+                    FullName = user.FullName,
+                    Username = user.UserName,
+                    Email = user.Email
+                }
+            };
+            return View(vm);
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UserProfile(UserProfileVm model)
+        {
+            ViewBag.Tab = "profile";
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            if (!ModelState.IsValid) 
+            {
+                return View(model);
+            }
+
+            // Update only FullName (Username should not be changed)
+            user.FullName = model.UserProfileInfo.FullName;
+
+            // Only update email if it's not empty and different from current
+            if (!string.IsNullOrEmpty(model.UserProfileInfo.Email) && 
+                model.UserProfileInfo.Email != user.Email)
+            {
+                user.Email = model.UserProfileInfo.Email;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View(model);
+            }
+
+            // If user wants to change password
+            if (!string.IsNullOrEmpty(model.UserProfileInfo.CurrentPassword) && 
+                !string.IsNullOrEmpty(model.UserProfileInfo.NewPassword))
+            {
+                if (string.IsNullOrEmpty(model.UserProfileInfo.ConfirmPassword))
+                {
+                    ModelState.AddModelError("UserProfileInfo.ConfirmPassword", "Please confirm your new password");
+                    return View(model);
+                }
+
+                if (model.UserProfileInfo.NewPassword != model.UserProfileInfo.ConfirmPassword)
+                {
+                    ModelState.AddModelError("UserProfileInfo.ConfirmPassword", "New password and confirm password do not match");
+                    return View(model);
+                }
+
+                var passwordChangeResult = await _userManager.ChangePasswordAsync(user, 
+                    model.UserProfileInfo.CurrentPassword, model.UserProfileInfo.NewPassword);
+
+                if (!passwordChangeResult.Succeeded)
+                {
+                    foreach (var error in passwordChangeResult.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                    return View(model);
+                }
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            ViewBag.SuccessMessage = "Profile updated successfully!";
+
+            // Reload current data
+            model.UserProfileInfo.Username = user.UserName;
+            model.UserProfileInfo.Email = user.Email;
+            model.UserProfileInfo.FullName = user.FullName;
+
+            return View(model);
+        }
+    }
+}

@@ -2,6 +2,7 @@
 @inject LayoutService layoutService
 @{
 var settings = layoutService.GetSettings();
+var basketItems = layoutService.GetBasketItems();
 }
 <!DOCTYPE html>
 <html lang="zxx">
@@ -116,10 +117,7 @@ var settings = layoutService.GetSettings();
                                                         <a href="product-details-left-thumbnail.html">left Thumbnail</a>
                                                     </li>
                                                     <li>
-                                                        <a href="product-details-right-thumbnail.html">
-                                                            Right
-                                                            Thumbnail
-                                                        </a>
+                                                        <a href="product-details-right-thumbnail.html">Right Thumbnail</a>
                                                     </li>
                                                     <li>
                                                         <a href="product-details-left-gallery.html">Left Gallery</a>
@@ -328,8 +326,16 @@ var settings = layoutService.GetSettings();
                             <div class="main-navigation flex-lg-right">
                                 <div class="cart-widget">
                                     <div class="login-block">
-                                        <a href="login-register.html" class="font-weight-bold">Login</a> <br>
-                                        <span>or</span><a href="login-register.html">Register</a>
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                            <a asp-controller="account" asp-action="userprofile">Hello, @User.Identity.Name</a> <br>
+                                            <a asp-controller="account" asp-action="logout">Logout</a> <br>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="account" asp-action="login">Login</a> <br>
+                                            <a asp-controller="account" asp-action="register">Register</a> <br>
+                                        }
                                     </div>
                                     <div class="cart-block">
                                         <div class="cart-total">
@@ -345,33 +351,7 @@ var settings = layoutService.GetSettings();
                                             </span>
                                         </div>
                                         <div class="cart-dropdown-block">
-                                            <div class=" single-cart-block ">
-                                                <div class="cart-product">
-                                                    <a href="product-details.html" class="image">
-                                                        <img src="~/assets/image/products/cart-product-1.jpg" alt="">
-                                                    </a>
-                                                    <div class="content">
-                                                        <h3 class="title">
-                                                            <a href="product-details.html">
-                                                                Kodak PIXPRO
-                                                                Astro Zoom AZ421 16 MP
-                                                            </a>
-                                                        </h3>
-                                                        <p class="price"><span class="qty">1 ×</span> £87.34</p>
-                                                        <button class="cross-btn"><i class="fas fa-times"></i></button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class=" single-cart-block ">
-                                                <div class="btn-block">
-                                                    <a href="cart.html" class="btn">
-                                                        View Cart <i class="fas fa-chevron-right"></i>
-                                                    </a>
-                                                    <a href="checkout.html" class="btn btn--primary">
-                                                        Check Out <i class="fas fa-chevron-right"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
+                                            @await Html.PartialAsync("_BasketPartial", basketItems)
                                         </div>
                                     </div>
                                 </div>
@@ -1000,6 +980,7 @@ var settings = layoutService.GetSettings();
     <script src="~/assets/js/ajax-mail.js"></script>
     <script src="~/assets/js/custom.js"></script>
     <script src="~/assets/js/main.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 <!-- Mirrored from htmldemo.net/pustok/pustok/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 21 Jan 2025 07:32:22 GMT -->

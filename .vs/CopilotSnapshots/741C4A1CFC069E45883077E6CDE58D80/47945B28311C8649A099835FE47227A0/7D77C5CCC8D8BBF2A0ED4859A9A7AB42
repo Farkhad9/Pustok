@@ -1,0 +1,102 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PustokApp.Data;
+using PustokApp.Models;
+using PustokApp.ViewModels;
+using System.Globalization;
+
+namespace PustokApp.Controllers
+{
+    public class BasketController (AppDbContext appContext): Controller
+    {
+        public IActionResult AddBasket(Guid id)
+        {
+            var book = appContext.Books.Find(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            List<BasketItemVm> basketItems;
+            var basket = Request.Cookies["basket"];
+            if (string.IsNullOrEmpty(basket))
+            {
+                basketItems = new List<BasketItemVm>();
+            }
+            else
+            {
+                basketItems = System.Text.Json.JsonSerializer.Deserialize<List<BasketItemVm>>(basket);
+            }
+            var existBasketItem = basketItems.FirstOrDefault(x => x.BookId == id);
+            if (existBasketItem == null)
+            { 
+            basketItems.Add(new BasketItemVm
+            {
+                BookId = book.Id,
+                Name = book.Name,
+                Price = book.DiscountPercent > 0 ? book.Price - (book.Price * book.DiscountPercent/100) : book.Price,
+                Count = 1,
+                MainImageUrl = book.MainImageUrl
+            });
+            }
+            else
+            {
+                existBasketItem.Count++;
+            }
+
+            if (User.Identity.IsAuthenticated)
+            {
+                CultureInfo cultureInfo = new CultureInfo("en-US");
+                var user = appContext.Users
+                    .Include(u => u.BasketItems)
+                    .FirstOrDefault(x => x.NormalizedUserName == User.Identity.Name.ToUpper(cultureInfo));
+                var existUserBasketItemDb = user.BasketItems.FirstOrDefault(x => x.BookId == id);
+                if (existUserBasketItemDb == null)
+                { 
+                user.BasketItems.Add(new BasketItem
+                {
+                    BookId = book.Id,
+                    Count = 1,
+                    AppUserId = user.Id
+                });
+                }
+                else
+                {
+                    existUserBasketItemDb.Count++;
+                }
+                appContext.SaveChanges();
+            }
+            Response.Cookies.Append("basket", System.Text.Json.JsonSerializer.Serialize(basketItems), new CookieOptions { MaxAge = TimeSpan.FromDays(7) });
+
+            return PartialView("_BasketPartial", basketItems);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public IActionResult SetCookie()
+        {
+            return View();
+        }
+    }
+}

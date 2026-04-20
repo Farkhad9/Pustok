@@ -53,16 +53,49 @@ namespace PustokApp.Areas.Manage.Controllers
                 return View(model);
             }
 
-            // Проверяем пароль
-            var isPasswordValid = await userManager.CheckPasswordAsync(user, model.Password);
-            if (!isPasswordValid)
+            // Проверяем если аккаунт заблокирован
+            if (await userManager.IsLockedOutAsync(user))
             {
-                ViewBag.ErrorMessage = "Username or password is incorrect";
+                ViewBag.ErrorMessage = "Your account is locked. Please try again after 15 minutes.";
                 return View(model);
             }
 
-            // Входим в систему
-            await signInManager.SignInAsync(user, isPersistent: true);
+            var isPasswordValid = await userManager.CheckPasswordAsync(user, model.Password);
+            if (!isPasswordValid)
+            {
+                // Увеличиваем счётчик неудачных попыток
+                await userManager.AccessFailedAsync(user);
+                
+                // Проверяем если аккаунт теперь заблокирован после этой попытки
+                if (await userManager.IsLockedOutAsync(user))
+                {
+                    ViewBag.ErrorMessage = "Your account has been locked due to multiple failed login attempts. Please try again after 15 minutes.";
+                    return View(model);
+                }
+
+                var failedAttempts = await userManager.GetAccessFailedCountAsync(user);
+                var remainingAttempts = 3 - failedAttempts;
+
+                if (remainingAttempts > 0)
+                {
+                    ViewBag.ErrorMessage = $"Username or password is incorrect. {remainingAttempts} attempt(s) remaining before your account is locked.";
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "Your account has been locked due to multiple failed login attempts. Please try again after 15 minutes.";
+                }
+
+                return View(model);
+            }
+
+            // Сбрасываем счётчик неудачных попыток при успешном входе
+            if (await userManager.GetAccessFailedCountAsync(user) > 0)
+            {
+                await userManager.ResetAccessFailedCountAsync(user);
+            }
+
+            // Вход с Remember Me опцией
+            await signInManager.SignInAsync(user, isPersistent: model.RememberMe);
 
             return RedirectToAction("Index", "Dashboard");
         }

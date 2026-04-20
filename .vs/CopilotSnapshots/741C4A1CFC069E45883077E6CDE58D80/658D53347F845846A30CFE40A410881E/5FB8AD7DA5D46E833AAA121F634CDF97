@@ -1,0 +1,63 @@
+﻿using Microsoft.EntityFrameworkCore;
+using PustokApp.Data;
+using PustokApp.ViewModels;
+using System.Text.Json;
+
+namespace PustokApp.Services
+{
+    public class LayoutService(AppDbContext context, IHttpContextAccessor httpContextAccessor)
+    {
+        public Dictionary<string, string> GetSettings()
+        {
+            return context.Settings.ToDictionary(s => s.Key, s => s.Value);
+        }
+        public List<BasketItemVm> GetBasketItems()
+        {
+            List<BasketItemVm> basketItems;
+            var basketStr = httpContextAccessor.HttpContext.Request.Cookies["basket"];
+            if (string.IsNullOrEmpty(basketStr))
+            {
+                basketItems = new List<BasketItemVm>();
+
+            }
+            else
+            {
+                basketItems = JsonSerializer.Deserialize<List<BasketItemVm>>(basketStr);
+            }
+
+
+            if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+            {
+                var user = context.Users
+                    .Include(u => u.BasketItems)
+                    .ThenInclude(bi => bi.Book)
+                    .FirstOrDefault(u => u.UserName == httpContextAccessor.HttpContext.User.Identity.Name);
+
+                foreach (var userbasketItem in user.BasketItems)
+                {
+                    var existBasketItemVm = basketItems.FirstOrDefault(bi => bi.BookId == userbasketItem.BookId);
+                    if (existBasketItemVm is null)
+                    {
+                        basketItems.Add(new BasketItemVm
+                        {
+                            BookId = userbasketItem.BookId,
+                            Name = userbasketItem.Book.Name,
+                            Price = userbasketItem.Book.DiscountPercent > 0 ? userbasketItem.Book.Price - (userbasketItem.Book.Price * userbasketItem.Book.DiscountPercent / 100) : userbasketItem.Book.Price,
+                            Count = userbasketItem.Count,
+                            MainImageUrl = userbasketItem.Book.MainImageUrl
+                        });
+                    }
+                    else
+                    {
+                        existBasketItemVm.Price = userbasketItem.Book.DiscountPercent > 0 ? userbasketItem.Book.Price - (userbasketItem.Book.Price * userbasketItem.Book.DiscountPercent / 100) : userbasketItem.Book.Price;
+                        existBasketItemVm.Name = userbasketItem.Book.Name;
+                        existBasketItemVm.Count = userbasketItem.Count;
+                        existBasketItemVm.MainImageUrl = userbasketItem.Book.MainImageUrl;
+                    }
+                }
+            }
+
+            return basketItems;
+        }
+    }
+}

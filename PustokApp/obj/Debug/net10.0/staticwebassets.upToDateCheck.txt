@@ -97,8 +97,8 @@ wwwroot\assets\image\products\product-details-3.jpg
 wwwroot\assets\image\products\product-details-4.jpg
 wwwroot\assets\image\products\product-details-5.jpg
 wwwroot\assets\js\ajax-mail.js
-wwwroot\assets\js\custom.js
 wwwroot\assets\js\main.js
+wwwroot\assets\js\custom.js
 wwwroot\assets\js\plugins.js
 wwwroot\favicon.ico
 wwwroot\manage\css\sb-admin-2.css
@@ -3676,8 +3676,8 @@ C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\manage\css\sb-admin-2.min.css
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\manage\css\sb-admin-2.css
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\favicon.ico
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\assets\js\plugins.js
-C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\assets\js\main.js
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\assets\js\custom.js
+C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\assets\js\main.js
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\assets\js\ajax-mail.js
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\assets\image\favicon.ico
 C:\Users\User\Desktop\PustokApp\PustokApp\wwwroot\assets\fonts\Ionicons28b5.svg

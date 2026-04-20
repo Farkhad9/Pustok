@@ -1,0 +1,107 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using PustokApp.ViewModels.UserVm;
+using PustokApp.Models;
+
+namespace PustokApp.Controllers
+{
+    [Authorize(Roles = "User")]
+    public class UserProfileController : Controller
+    {
+        private readonly UserManager<AppUser> _userManager;
+
+        public UserProfileController(UserManager<AppUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return NotFound();
+
+            var vm = new UserProfileVm
+            {
+                UserProfileInfo = new UserProfileInfoVm
+                {
+                    FullName = user.FullName,
+                    Username = user.UserName,
+                    Email = user.Email
+                }
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index(UserProfileVm model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return NotFound();
+
+            // Обновляем основную информацию профиля
+            user.FullName = model.UserProfileInfo.FullName;
+            user.Email = model.UserProfileInfo.Email;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View(model);
+            }
+
+            // Если пользователь хочет изменить пароль
+            if (!string.IsNullOrEmpty(model.UserProfileInfo.CurrentPassword) && 
+                !string.IsNullOrEmpty(model.UserProfileInfo.NewPassword))
+            {
+                if (string.IsNullOrEmpty(model.UserProfileInfo.ConfirmPassword))
+                {
+                    ModelState.AddModelError("UserProfileInfo.ConfirmPassword", "Please confirm your new password");
+                    return View(model);
+                }
+
+                if (model.UserProfileInfo.NewPassword != model.UserProfileInfo.ConfirmPassword)
+                {
+                    ModelState.AddModelError("UserProfileInfo.ConfirmPassword", "New password and confirm password do not match");
+                    return View(model);
+                }
+
+                var passwordChangeResult = await _userManager.ChangePasswordAsync(user, 
+                    model.UserProfileInfo.CurrentPassword, model.UserProfileInfo.NewPassword);
+
+                if (!passwordChangeResult.Succeeded)
+                {
+                    foreach (var error in passwordChangeResult.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                    return View(model);
+                }
+            }
+
+            // Перезагружаем данные и показываем сообщение об успехе
+            model.UserProfileInfo.Username = user.UserName;
+            ViewBag.SuccessMessage = "Profile updated successfully!";
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            // Используем корневой Account для выхода
+            return RedirectToAction("Logout", "Account");
+        }
+    }
+}

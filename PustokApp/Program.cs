@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PustokApp;
 using PustokApp.Data;
 using PustokApp.Models;
 using PustokApp.Services;
@@ -23,11 +24,14 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(opt => {
     opt.Password.RequireNonAlphanumeric = true;
     opt.Password.RequireUppercase = true;
     opt.Password.RequireLowercase = true;
-    //opt.User.RequireUniqueEmail = true;
+    opt.User.RequireUniqueEmail = true;
     opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(10);
     opt.Lockout.MaxFailedAccessAttempts = 3;
     opt.Lockout.AllowedForNewUsers = true;
-}).AddEntityFrameworkStores<AppDbContext>();
+})
+    .AddErrorDescriber<CustomIdentityErrorDescriber>()   
+    .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddHttpContextAccessor();
 
 
 var app = builder.Build();
@@ -42,7 +46,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles(); 
-app.UseAuthorization();
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=dashboard}/{action=Index}/{id?}");
