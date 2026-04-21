@@ -45,7 +45,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=dashboard}/{action=Index}/{id?}");

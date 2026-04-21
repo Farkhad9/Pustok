@@ -350,6 +350,68 @@ namespace PustokApp.Migrations
                     b.ToTable("BookTags");
                 });
 
+            modelBuilder.Entity("PustokApp.Models.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TownCity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZipCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("PustokApp.Models.OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItems");
+                });
+
             modelBuilder.Entity("PustokApp.Models.Setting", b =>
                 {
                     b.Property<string>("Key")
@@ -516,9 +578,31 @@ namespace PustokApp.Migrations
                     b.Navigation("Tag");
                 });
 
+            modelBuilder.Entity("PustokApp.Models.Order", b =>
+                {
+                    b.HasOne("PustokApp.Models.AppUser", "AppUser")
+                        .WithMany("Orders")
+                        .HasForeignKey("AppUserId");
+
+                    b.Navigation("AppUser");
+                });
+
+            modelBuilder.Entity("PustokApp.Models.OrderItem", b =>
+                {
+                    b.HasOne("PustokApp.Models.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("PustokApp.Models.AppUser", b =>
                 {
                     b.Navigation("BasketItems");
+
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("PustokApp.Models.Author", b =>
@@ -531,6 +615,11 @@ namespace PustokApp.Migrations
                     b.Navigation("BookImages");
 
                     b.Navigation("BookTags");
+                });
+
+            modelBuilder.Entity("PustokApp.Models.Order", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("PustokApp.Models.Tag", b =>

@@ -1976,6 +1976,6 @@ C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\PustokApp.pdb
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\PustokApp.genruntimeconfig.cache
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\ref\PustokApp.dll
 C:\Users\User\Desktop\PustokApp\PustokApp\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
-C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
-C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\c9omw494xo-{0}-rqz0janmkw-rqz0janmkw.gz
 C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\pkoat18uxq-{0}-3lf3m66jgj-3lf3m66jgj.gz
+C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+C:\Users\User\Desktop\PustokApp\PustokApp\obj\Debug\net10.0\compressed\c9omw494xo-{0}-2fkl8xk4ro-2fkl8xk4ro.gz

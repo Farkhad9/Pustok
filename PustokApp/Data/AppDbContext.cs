@@ -13,6 +13,8 @@ namespace PustokApp.Data
         public DbSet<BookImage> BookImages { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<BookTag> BookTags { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<BasketItem> BasketItems { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

@@ -72,8 +72,7 @@
 										<table class="table table-bordered">
 											<thead class="thead-light">
 												<tr>
-													<th>No</th>
-													<th>Name</th>
+													<th>Order ID</th>
 													<th>Date</th>
 													<th>Status</th>
 													<th>Total</th>
@@ -81,14 +80,30 @@
 												</tr>
 											</thead>
 											<tbody>
-												<tr>
-													<td>01</td>
-													<td>Peter Parker</td>
-													<td>Aug 15, 2020</td>
-													<td>Processing</td>
-													<td>$999.00</td>
-													<td><a href="#">View</a></td>
-												</tr>
+												@if (Model.Orders != null && Model.Orders.Count > 0)
+												{
+													@foreach (var order in Model.Orders)
+													{
+														<tr>
+															<td>@order.Id.ToString().Substring(0, 8)</td>
+															<td>@order.CreatedDate.ToString("MMM dd, yyyy")</td>
+															<td>@order.Status</td>
+															<td>$@order.TotalPrice.ToString("F2")</td>
+															<td>
+																<button class="btn-link" data-bs-toggle="modal" data-bs-target="#orderModal" 
+																	onclick="showOrderDetails('@order.Id')">
+																	View
+																</button>
+															</td>
+														</tr>
+													}
+												}
+												else
+												{
+													<tr>
+														<td colspan="5">No orders yet</td>
+													</tr>
+												}
 											</tbody>
 										</table>
 									</div>
@@ -226,3 +241,85 @@
 		</div>
 	</div>
 </div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Order Details</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<div id="orderDetails">
+					<!-- Order items will be loaded here -->
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		function showOrderDetails(orderId) {
+			// Make AJAX call to get order details
+			fetch(`/api/orders/${orderId}`)
+				.then(response => response.json())
+				.then(data => {
+					let html = `
+						<div class="order-details">
+							<h6>Order ID: <strong>${data.id.substring(0, 8)}</strong></h6>
+							<p>Date: <strong>${new Date(data.createdDate).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}</strong></p>
+							<p>Status: <strong>${data.status}</strong></p>
+							<hr>
+							<h6>Items:</h6>
+							<table class="table table-sm">
+								<thead>
+									<tr>
+										<th>Product Name</th>
+										<th>Quantity</th>
+										<th>Price</th>
+										<th>Total</th>
+									</tr>
+								</thead>
+								<tbody>
+					`;
+
+					data.orderItems.forEach(item => {
+						const itemTotal = (item.price * item.quantity).toFixed(2);
+						html += `
+							<tr>
+								<td>${item.bookName}</td>
+								<td>${item.quantity}</td>
+								<td>$${item.price.toFixed(2)}</td>
+								<td>$${itemTotal}</td>
+							</tr>
+						`;
+					});
+
+					html += `
+								</tbody>
+							</table>
+							<hr>
+							<h6>Total Price: <strong>$${data.totalPrice.toFixed(2)}</strong></h6>
+							<hr>
+							<h6>Shipping Address:</h6>
+							<p>
+								${data.address}<br>
+								${data.townCity}, ${data.state} ${data.zipCode}
+							</p>
+						</div>
+					`;
+
+					document.getElementById('orderDetails').innerHTML = html;
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					document.getElementById('orderDetails').innerHTML = '<p class="text-danger">Error loading order details</p>';
+				});
+		}
+	</script>
+}

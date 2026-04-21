@@ -1,0 +1,165 @@
+﻿@using PustokApp.Models
+@model List<Order>
+@{
+	int count = 0;
+}
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<h1>Orders Management</h1>
+		</div>
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Order ID</th>
+					<th>Customer</th>
+					<th>Date</th>
+					<th>Total</th>
+					<th>Status</th>
+					<th>Items</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				@if (Model != null && Model.Count > 0)
+				{
+					@foreach (var order in Model)
+					{
+						count++;
+						<tr>
+							<td>@count</td>
+							<td>@order.Id.ToString().Substring(0, 8)</td>
+							<td>@(order.AppUser?.UserName ?? "Unknown")</td>
+							<td>@order.CreatedDate.ToString("MMM dd, yyyy")</td>
+							<td>$@order.TotalPrice.ToString("F2")</td>
+							<td>
+								@switch(order.Status)
+								{
+									case OrderStatus.Pending:
+										<span class="badge bg-warning text-dark">Pending</span>
+										break;
+									case OrderStatus.Accepted:
+										<span class="badge bg-success">Accepted</span>
+										break;
+									case OrderStatus.Rejected:
+										<span class="badge bg-danger">Rejected</span>
+										break;
+								}
+							</td>
+							<td>
+								<!-- Hidden data for this order -->
+								<div class="d-none" id="items-data-@order.Id">
+									@if (order.OrderItems != null && order.OrderItems.Count > 0)
+									{
+										@foreach (var item in order.OrderItems)
+										{
+											<tr>
+												<td>@(item.Book?.Name ?? "Unknown")</td>
+												<td>@item.Count</td>
+												<td>$@item.Price.ToString("F2")</td>
+												<td>$@((item.Count * item.Price).ToString("F2"))</td>
+											</tr>
+										}
+									}
+									else
+									{
+										<tr>
+											<td colspan="4" class="text-center">No items found</td>
+										</tr>
+									}
+								</div>
+
+								<button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#itemsModal" onclick="showOrderItems('@order.Id')">
+									View Items
+								</button>
+							</td>
+							<td>
+								@if (order.Status != OrderStatus.Accepted)
+								{
+									<form asp-action="AcceptOrder" asp-route-id="@order.Id" method="post" style="display:inline;" onsubmit="return confirm('Accept this order?')">
+										<button type="submit" class="btn btn-success btn-sm">Accept</button>
+									</form>
+								}
+								@if (order.Status != OrderStatus.Rejected)
+								{
+									<form asp-action="RejectOrder" asp-route-id="@order.Id" method="post" style="display:inline;" onsubmit="return confirm('Reject this order?')">
+										<button type="submit" class="btn btn-warning btn-sm">Reject</button>
+									</form>
+								}
+								<form asp-action="DeleteOrder" asp-route-id="@order.Id" method="post" style="display:inline;" onsubmit="return confirm('Delete this order?')">
+									<button type="submit" class="btn btn-danger btn-sm">Delete</button>
+								</form>
+							</td>
+						</tr>
+					}
+				}
+				else
+				{
+					<tr>
+						<td colspan="8" class="text-center">No orders found</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!-- Items Modal -->
+<div class="modal fade" id="itemsModal" tabindex="-1">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Order Items</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<table class="table table-sm">
+					<thead>
+						<tr>
+							<th>Product Name</th>
+							<th>Quantity</th>
+							<th>Price</th>
+							<th>Total</th>
+						</tr>
+					</thead>
+					<tbody id="itemsTableBody">
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts
+{
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+		// Show success message if TempData exists
+		@if (TempData["SuccessMessage"] != null)
+		{
+			<text>
+				Swal.fire({
+					title: 'Success!',
+					text: '@TempData["SuccessMessage"]',
+					icon: 'success',
+					confirmButtonColor: '#28a745',
+					timer: 3000
+				});
+			</text>
+		}
+
+		function showOrderItems(orderId) {
+			// Find the hidden div containing the items HTML
+			const hiddenDiv = document.getElementById('items-data-' + orderId);
+			const tableBody = document.getElementById('itemsTableBody');
+
+			if (hiddenDiv) {
+				tableBody.innerHTML = hiddenDiv.innerHTML;
+			} else {
+				tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error loading items</td></tr>';
+			}
+		}
+	</script>
+}

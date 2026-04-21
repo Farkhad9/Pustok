@@ -1,0 +1,59 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PustokApp.Data;
+
+namespace PustokApp.Controllers.Api
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class OrdersController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public OrdersController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrderDetails(string id)
+        {
+            if (!Guid.TryParse(id, out var orderId))
+            {
+                return BadRequest("Invalid order ID");
+            }
+
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Book)
+                .Include(o => o.AppUser)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+            {
+                return NotFound("Order not found");
+            }
+
+            var orderDto = new
+            {
+                id = order.Id.ToString(),
+                createdDate = order.CreatedDate,
+                status = order.Status.ToString(),
+                totalPrice = order.TotalPrice,
+                address = order.Address,
+                townCity = order.TownCity,
+                state = order.State,
+                zipCode = order.ZipCode,
+                orderItems = order.OrderItems.Select(oi => new
+                {
+                    bookName = oi.Book != null ? oi.Book.Name : "Unknown",
+                    quantity = oi.Count,
+                    price = oi.Price
+                }).ToList()
+            };
+
+            return Ok(orderDto);
+        }
+    }
+}

@@ -40,7 +40,7 @@ $(document).ready(function () {
         fetch(url)
             .then((response) => response.text())
             .then((html) => {
-                $(".cart-dropdown-block").html(html);
+                $(".cart-block").html(html);
             });
     });
 });

@@ -152,19 +152,25 @@ namespace PustokApp.Controllers
                 var basketItems = System.Text.Json.JsonSerializer.Deserialize<List<BasketItemVm>>(basketCookie);
                 if (basketItems != null && basketItems.Count > 0)
                 {
-                    // Clear old basket for this user
-                    var oldBasketItems = _dbContext.BasketItems.Where(b => b.AppUserId == user.Id).ToList();
-                    _dbContext.BasketItems.RemoveRange(oldBasketItems);
-
-                    // Add items from cookie
+                    // Merge cookie items with existing user basket (do not clear)
                     foreach (var item in basketItems)
                     {
-                        _dbContext.BasketItems.Add(new BasketItem
+                        var existingDbItem = _dbContext.BasketItems
+                            .FirstOrDefault(b => b.BookId == item.BookId && b.AppUserId == user.Id);
+
+                        if (existingDbItem == null)
                         {
-                            BookId = item.BookId,
-                            Count = item.Count,
-                            AppUserId = user.Id
-                        });
+                            _dbContext.BasketItems.Add(new BasketItem
+                            {
+                                BookId = item.BookId,
+                                Count = item.Count,
+                                AppUserId = user.Id
+                            });
+                        }
+                        else
+                        {
+                            existingDbItem.Count += item.Count;
+                        }
                     }
 
                     _dbContext.SaveChanges();
@@ -181,6 +187,7 @@ namespace PustokApp.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            Response.Cookies.Delete("basket");
             return RedirectToAction("Index", "Home");
         }
 
@@ -189,7 +196,9 @@ namespace PustokApp.Controllers
         public async Task<IActionResult> UserProfile(string tab = "dashboard")
         {
             ViewBag.Tab = tab;
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _dbContext.Users
+                .Include(u => u.Orders.Where(o => o.Status == OrderStatus.Accepted))
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
             if (user == null)
                 return NotFound();
 
@@ -200,7 +209,8 @@ namespace PustokApp.Controllers
                     FullName = user.FullName,
                     Username = user.UserName,
                     Email = user.Email
-                }
+                },
+                Orders = user.Orders
             };
             return View(vm);
         }
@@ -211,7 +221,9 @@ namespace PustokApp.Controllers
         public async Task<IActionResult> UserProfile(UserProfileVm model)
         {
             ViewBag.Tab = "profile";
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _dbContext.Users
+                .Include(u => u.Orders.Where(o => o.Status == OrderStatus.Accepted))
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
             if (user == null) return NotFound();
 
             if (!ModelState.IsValid) 
@@ -275,8 +287,14 @@ namespace PustokApp.Controllers
             model.UserProfileInfo.Username = user.UserName;
             model.UserProfileInfo.Email = user.Email;
             model.UserProfileInfo.FullName = user.FullName;
-
+            model.Orders = user.Orders;
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

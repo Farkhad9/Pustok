@@ -1,0 +1,267 @@
+﻿@using PustokApp.Models
+@model List<Order>
+@{
+	int count = 0;
+}
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<h1>Orders Management</h1>
+		</div>
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Order ID</th>
+					<th>Customer</th>
+					<th>Date</th>
+					<th>Total</th>
+					<th>Status</th>
+					<th>Items</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				@if (Model != null && Model.Count > 0)
+				{
+					@foreach (var order in Model)
+					{
+						count++;
+						<tr>
+							<td>@count</td>
+							<td>@order.Id.ToString().Substring(0, 8)</td>
+							<td>@(order.AppUser?.UserName ?? "Unknown")</td>
+							<td>@order.CreatedDate.ToString("MMM dd, yyyy")</td>
+							<td>$@order.TotalPrice.ToString("F2")</td>
+							<td>
+								@switch(order.Status)
+								{
+									case OrderStatus.Pending:
+										<span class="badge bg-warning text-dark">Pending</span>
+										break;
+									case OrderStatus.Accepted:
+										<span class="badge bg-success">Accepted</span>
+										break;
+									case OrderStatus.Rejected:
+										<span class="badge bg-danger">Rejected</span>
+										break;
+								}
+							</td>
+							<td>
+								<button class="btn btn-info btn-sm viewItemsBtn" data-order-id="@order.Id" data-bs-toggle="modal" data-bs-target="#itemsModal">
+									View Items
+								</button>
+							</td>
+							<td>
+								@if (order.Status != OrderStatus.Accepted)
+								{
+									<button type="button" class="btn btn-success btn-sm acceptBtn" data-order-id="@order.Id">
+										Accept
+									</button>
+								}
+								@if (order.Status != OrderStatus.Rejected)
+								{
+									<button type="button" class="btn btn-warning btn-sm rejectBtn" data-order-id="@order.Id">
+										Reject
+									</button>
+								}
+								<button type="button" class="btn btn-danger btn-sm deleteBtn" data-order-id="@order.Id">
+									Delete
+								</button>
+							</td>
+						</tr>
+					}
+				}
+				else
+				{
+					<tr>
+						<td colspan="8" class="text-center">No orders found</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!-- Items Modal -->
+<div class="modal fade" id="itemsModal" tabindex="-1">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Order Items</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<table class="table table-sm">
+					<thead>
+						<tr>
+							<th>Product Name</th>
+							<th>Quantity</th>
+							<th>Price</th>
+							<th>Total</th>
+						</tr>
+					</thead>
+					<tbody id="itemsTableBody">
+						<tr><td colspan="4" class="text-center">Loading...</td></tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts
+{
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+		// Show success message if TempData exists
+		@if (TempData["SuccessMessage"] != null)
+		{
+			<text>
+				Swal.fire({
+					title: 'Success!',
+					text: '@TempData["SuccessMessage"]',
+					icon: 'success',
+					confirmButtonColor: '#28a745',
+					timer: 3000
+				});
+			</text>
+		}
+
+		function showOrderItems(orderId) {
+			console.log('Loading items for order:', orderId);
+
+			fetch(`/Manage/Order/GetOrderItems?id=${orderId}`)
+				.then(response => {
+					console.log('Response status:', response.status);
+					if (!response.ok) {
+						throw new Error(`HTTP error! status: ${response.status}`);
+					}
+					return response.json();
+				})
+				.then(data => {
+					console.log('Data received:', data);
+					let html = '';
+
+					if (data && data.length > 0) {
+						data.forEach(item => {
+							const itemTotal = (item.price * item.quantity).toFixed(2);
+							html += `
+								<tr>
+									<td>${item.bookName}</td>
+									<td>${item.quantity}</td>
+									<td>$${parseFloat(item.price).toFixed(2)}</td>
+									<td>$${itemTotal}</td>
+								</tr>
+							`;
+						});
+					} else {
+						html = '<tr><td colspan="4" class="text-center">No items found</td></tr>';
+					}
+
+					document.getElementById('itemsTableBody').innerHTML = html;
+				})
+				.catch(error => {
+					console.error('Error loading items:', error);
+					Swal.fire('Error', `Failed to load items: ${error.message}`, 'error');
+					document.getElementById('itemsTableBody').innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error loading items</td></tr>';
+				});
+		}
+
+		// View Items Button Click
+		document.querySelectorAll('.viewItemsBtn').forEach(btn => {
+			btn.addEventListener('click', function(e) {
+				const orderId = this.getAttribute('data-order-id');
+				showOrderItems(orderId);
+			});
+		});
+
+		// Accept Order
+		document.querySelectorAll('.acceptBtn').forEach(btn => {
+			btn.addEventListener('click', function() {
+				const orderId = this.getAttribute('data-order-id');
+
+				Swal.fire({
+					title: 'Accept Order?',
+					text: "Are you sure you want to accept this order?",
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonColor: '#28a745',
+					cancelButtonColor: '#6c757d',
+					confirmButtonText: 'Yes, Accept'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						submitOrderAction('/Manage/Order/AcceptOrder', orderId);
+					}
+				});
+			});
+		});
+
+		// Reject Order
+		document.querySelectorAll('.rejectBtn').forEach(btn => {
+			btn.addEventListener('click', function() {
+				const orderId = this.getAttribute('data-order-id');
+
+				Swal.fire({
+					title: 'Reject Order?',
+					text: "Are you sure you want to reject this order?",
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonColor: '#ffc107',
+					cancelButtonColor: '#6c757d',
+					confirmButtonText: 'Yes, Reject'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						submitOrderAction('/Manage/Order/RejectOrder', orderId);
+					}
+				});
+			});
+		});
+
+		// Delete Order
+		document.querySelectorAll('.deleteBtn').forEach(btn => {
+			btn.addEventListener('click', function() {
+				const orderId = this.getAttribute('data-order-id');
+
+				Swal.fire({
+					title: 'Delete Order?',
+					text: "Are you sure? This cannot be undone!",
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#dc3545',
+					cancelButtonColor: '#6c757d',
+					confirmButtonText: 'Yes, Delete'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						submitOrderAction('/Manage/Order/DeleteOrder', orderId);
+					}
+				});
+			});
+		});
+
+		function submitOrderAction(action, orderId) {
+			console.log('Submitting action:', action, 'Order ID:', orderId);
+
+			const form = document.createElement('form');
+			form.method = 'POST';
+			form.action = action;
+
+			// Add CSRF token
+			const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+			console.log('CSRF Token found:', !!token);
+
+			if (token) {
+				form.innerHTML = `
+					<input type="hidden" name="__RequestVerificationToken" value="${token}">
+					<input type="hidden" name="id" value="${orderId}">
+				`;
+			} else {
+				form.innerHTML = `<input type="hidden" name="id" value="${orderId}">`;
+			}
+
+			document.body.appendChild(form);
+			form.submit();
+		}
+	</script>
+}
